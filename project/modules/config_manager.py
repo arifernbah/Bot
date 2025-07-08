@@ -28,7 +28,11 @@ class SmartConfig:
         # Trading parameters (optimized untuk $5 modal)
         # Support multi-symbol list; keep backward-compat single symbol attr
         self.symbol = "BTCUSDT"             # primary / default symbol
-        self.symbols = ["BTCUSDT"]          # list of symbols for multi-pair mode
+        # Default top 10 large-cap futures pairs (relative safety vs. low-cap)
+        self.symbols = [
+            "BTCUSDT", "ETHUSDT", "BNBUSDT", "XRPUSDT", "SOLUSDT",
+            "ADAUSDT", "AVAXUSDT", "MATICUSDT", "DOTUSDT", "LTCUSDT"
+        ]
         self.timeframe = "5m"
         self.modal_awal = 5.0  # $5 starting capital
         
