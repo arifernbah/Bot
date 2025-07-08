@@ -26,7 +26,9 @@ class SmartConfig:
         self.telegram_chat_id = ""
         
         # Trading parameters (optimized untuk $5 modal)
-        self.symbol = "BTCUSDT"
+        # Support multi-symbol list; keep backward-compat single symbol attr
+        self.symbol = "BTCUSDT"             # primary / default symbol
+        self.symbols = ["BTCUSDT"]          # list of symbols for multi-pair mode
         self.timeframe = "5m"
         self.modal_awal = 5.0  # $5 starting capital
         
@@ -59,6 +61,9 @@ class SmartConfig:
                 for key, value in config_data.items():
                     if hasattr(self, key):
                         setattr(self, key, value)
+                # Backward compatibility: if only 'symbol' provided, build symbols list
+                if 'symbols' not in config_data and 'symbol' in config_data:
+                    self.symbols = [config_data['symbol']]
                         
                 logger.info("Configuration loaded successfully")
                 
@@ -71,6 +76,7 @@ class SmartConfig:
             config_data = {
                 'is_testnet': self.is_testnet,
                 'symbol': self.symbol,
+                'symbols': self.symbols,
                 'timeframe': self.timeframe,
                 'modal_awal': self.modal_awal,
                 'max_risk_per_trade': self.max_risk_per_trade,

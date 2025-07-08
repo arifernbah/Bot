@@ -60,7 +60,12 @@ class BinanceFuturesProBot:
     def __init__(self):
         # Initialize configuration
         self.config = SmartConfig()
-        
+        # Support multiple symbols
+        self.symbols = self.config.symbols or [self.config.symbol]
+        # For backward compatibility
+        if not hasattr(self.config, 'symbols'):
+            self.symbols = [self.config.symbol]
+
         # Initialize Binance client
         self.client: Optional[AsyncClient] = None
         
@@ -339,11 +344,10 @@ class BinanceFuturesProBot:
             logger.error(f"Error getting klines data: {e}")
             return []
     
-    async def execute_trade_pro(self, entry_analysis: Dict[str, Any]) -> bool:
+    async def execute_trade_pro(self, symbol: str, entry_analysis: Dict[str, Any]) -> bool:
         """Execute trade dengan professional analysis"""
         try:
             action = entry_analysis['action']
-            symbol = self.config.symbol
             confidence = entry_analysis['confidence']
             reason = entry_analysis['reason']
             pro_analysis = entry_analysis.get('pro_analysis', {})
@@ -500,69 +504,53 @@ class BinanceFuturesProBot:
             try:
                 # Memory optimization
                 self.optimize_memory()
-                
-                # Get current positions
-                positions = await self.client.futures_position_information(symbol=self.config.symbol)
-                current_position = positions[0] if positions else None
-                position_amt = float(current_position['positionAmt']) if current_position else 0
-                
-                # Get market data
-                klines_data = await self.get_klines_data(
-                    self.config.symbol,
-                    self.config.timeframe,
-                    limit=50
-                )
-                
-                if not klines_data:
-                    await asyncio.sleep(30)
-                    continue
-                
-                current_price = klines_data[-1][4]
-                
-                # CHECK EXIT CONDITIONS (if we have position)
-                if position_amt != 0:
-                    # Get entry analysis if available
-                    entry_analysis = None
-                    if self.config.symbol in self.active_entries:
-                        entry_analysis = self.active_entries[self.config.symbol].get('entry_analysis')
-                    
-                    exit_analysis = self.smart_exit.should_exit(
-                        current_position, 
-                        current_price, 
-                        klines_data, 
-                        entry_analysis
-                    )
-                    
-                    if exit_analysis['action'] == 'close':
-                        await self.close_position_pro(self.config.symbol, current_position, exit_analysis)
-                        await asyncio.sleep(5)
+
+                # Fetch all positions once for heat & limits
+                all_positions = await self.client.futures_position_information()
+                open_positions = [p for p in all_positions if float(p['positionAmt']) != 0]
+
+                for symbol in self.symbols:
+                    # Filter position for this symbol
+                    symbol_positions = [p for p in all_positions if p['symbol'] == symbol]
+                    current_position = symbol_positions[0] if symbol_positions else None
+                    position_amt = float(current_position['positionAmt']) if current_position else 0
+
+                    # Get klines data
+                    klines_data = await self.get_klines_data(symbol, self.config.timeframe, limit=50)
+                    if not klines_data:
                         continue
-                
-                # CHECK ENTRY CONDITIONS (if no position)
-                elif self.config.max_open_positions > len([p for p in positions if float(p['positionAmt']) != 0]):
-                    entry_analysis = self.smart_entry.analyze_entry(klines_data)
-                    
-                    if entry_analysis['action'] in ['long', 'short'] and entry_analysis['confidence'] >= 60:
-                        success = await self.execute_trade_pro(entry_analysis)
-                        
-                        if success:
-                            # Add to history untuk Kelly calculation
-                            self.smart_entry.add_trade_to_history({
-                                'symbol': self.config.symbol,
-                                'action': entry_analysis['action'],
-                                'confidence': entry_analysis['confidence'],
-                                'timestamp': datetime.now(),
-                                'entry_price': current_price
-                            })
-                        
-                        await asyncio.sleep(10)
-                
-                # Adaptive sleep
-                if position_amt != 0:
-                    await asyncio.sleep(15)  # Monitor positions more frequently
-                else:
-                    await asyncio.sleep(30)  # Normal monitoring
-                    
+
+                    current_price = klines_data[-1][4]
+
+                    # EXIT CONDITIONS
+                    if position_amt != 0:
+                        entry_analysis = self.active_entries.get(symbol, {}).get('entry_analysis') if symbol in self.active_entries else None
+                        exit_analysis = self.smart_exit.should_exit(current_position, current_price, klines_data, entry_analysis)
+                        if exit_analysis['action'] == 'close':
+                            await self.close_position_pro(symbol, current_position, exit_analysis)
+                            await asyncio.sleep(1)
+                        continue  # move to next symbol after exit processing
+
+                    # ENTRY CONDITIONS
+                    if self.config.max_open_positions > len(open_positions):
+                        entry_analysis = self.smart_entry.analyze_entry(klines_data)
+                        if entry_analysis['action'] in ['long', 'short'] and entry_analysis['confidence'] >= 60:
+                            success = await self.execute_trade_pro(symbol, entry_analysis)
+                            if success:
+                                self.smart_entry.add_trade_to_history({
+                                    'symbol': symbol,
+                                    'action': entry_analysis['action'],
+                                    'confidence': entry_analysis['confidence'],
+                                    'timestamp': datetime.now(),
+                                    'entry_price': current_price
+                                })
+                                open_positions.append({'positionAmt': 'dummy'})  # increment count to avoid extra entries same loop
+
+                    await asyncio.sleep(0)  # yield control
+
+                # Adaptive sleep after full symbol sweep
+                await asyncio.sleep(15)
+
             except Exception as e:
                 logger.error(f"Error in trading loop: {e}")
                 error_msg = self.telegram.get_error_message("analysis", str(e))
