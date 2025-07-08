@@ -122,10 +122,13 @@ class KellyCriterionCalculator:
                 max_risk = 0.03    # 3%
             elif balance < 100:
                 min_risk = 0.005   # 0.5%
-                max_risk = 0.05    # 5%
+                max_risk = 0.04    # 4%
+            elif balance < 500:
+                min_risk = 0.005
+                max_risk = 0.03    # 3% mid-large accounts
             else:
                 min_risk = 0.005
-                max_risk = 0.06    # 6% for larger accounts
+                max_risk = 0.025   # 2.5% for big accounts
 
             final_risk_pct = max(min_risk, min(adjusted_kelly, max_risk))
             
@@ -136,12 +139,14 @@ class KellyCriterionCalculator:
             risk_amount = max(risk_amount - fee_buffer, 0)
             
             # Dynamic leverage cap
-            if balance >= 200:
-                leverage_cap = 5
-            elif balance >= 100:
-                leverage_cap = 4
-            else:
+            if balance >= 500:
                 leverage_cap = 3
+            elif balance >= 200:
+                leverage_cap = 3
+            elif balance >= 100:
+                leverage_cap = 2.5
+            else:
+                leverage_cap = 2
 
             return {
                 "risk_percentage": final_risk_pct,
@@ -180,9 +185,9 @@ class KellyCriterionCalculator:
              if balance < 100:
                  max_heat_pct = 0.10  # 10%
              elif balance < 500:
-                 max_heat_pct = 0.125 # 12.5%
+                 max_heat_pct = 0.12 # 12%
              else:
-                 max_heat_pct = 0.15  # 15%
+                 max_heat_pct = 0.12  # keep 12% for big account as well
              
              current_heat_pct = total_risk_usd / balance if balance > 0 else 0
              

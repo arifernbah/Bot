@@ -555,9 +555,11 @@ class SmartEntry:
         if balance < 20:
             max_risk_cap = 0.03  # 3 %
         elif balance < 100:
-            max_risk_cap = 0.05  # 5 %
+            max_risk_cap = 0.04  # 4 %
+        elif balance < 500:
+            max_risk_cap = 0.03  # 3 %
         else:
-            max_risk_cap = 0.06  # 6 % for larger accounts
+            max_risk_cap = 0.025 # 2.5 %
 
         # Final position size calculation
         final_size = base_kelly * score_multiplier * genius_multiplier
@@ -568,12 +570,14 @@ class SmartEntry:
         base_leverage = 1 + score_multiplier
         confidence_boost = 1 + (genius_multiplier - 1) * 0.5  # Moderate leverage boost
         # Dynamic leverage cap by balance tier
-        if balance >= 200:
-            leverage_cap = 5
-        elif balance >= 100:
-            leverage_cap = 4
-        else:
+        if balance >= 500:
             leverage_cap = 3
+        elif balance >= 200:
+            leverage_cap = 3
+        elif balance >= 100:
+            leverage_cap = 2.5
+        else:
+            leverage_cap = 2
 
         final_leverage = min(base_leverage * confidence_boost, leverage_cap)
         
