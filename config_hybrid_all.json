@@ -1,0 +1,409 @@
+{
+    "$3": {
+        "initial_balance": 3,
+        "exchange": "binance_futures",
+        "leverage": 10,
+        "symbol": "BTCUSDT",
+        "timeframe": "5m",
+        "strategy": "hybrid",
+        "risk_level": "ultra_low",
+        "max_open_trades": 1,
+        "position_sizing": {
+            "method": "fixed_fraction",
+            "fraction": 0.8
+        },
+        "safety_orders": {
+            "enabled": true,
+            "max_safety_orders": 2,
+            "martingale_volume_coefficient": 1.2,
+            "martingale_step_coefficient": 1.1
+        },
+        "take_profit": {
+            "enabled": true,
+            "tp_percent": 1.0
+        },
+        "stop_loss": {
+            "enabled": true,
+            "sl_percent": 5.0
+        },
+        "trailing": {
+            "enabled": true,
+            "trailing_percent": 0.3
+        },
+        "session": {
+            "active_hours_only": false,
+            "session_hours": "00:00-23:59"
+        },
+        "vps": "1GB"
+    },
+    "$5": {
+        "initial_balance": 5,
+        "exchange": "binance_futures",
+        "leverage": 10,
+        "symbol": "BTCUSDT",
+        "timeframe": "5m",
+        "strategy": "hybrid",
+        "risk_level": "very_low",
+        "max_open_trades": 1,
+        "position_sizing": {
+            "method": "fixed_fraction",
+            "fraction": 0.8
+        },
+        "safety_orders": {
+            "enabled": true,
+            "max_safety_orders": 2,
+            "martingale_volume_coefficient": 1.2,
+            "martingale_step_coefficient": 1.1
+        },
+        "take_profit": {
+            "enabled": true,
+            "tp_percent": 1.0
+        },
+        "stop_loss": {
+            "enabled": true,
+            "sl_percent": 5.0
+        },
+        "trailing": {
+            "enabled": true,
+            "trailing_percent": 0.3
+        },
+        "session": {
+            "active_hours_only": false,
+            "session_hours": "00:00-23:59"
+        },
+        "vps": "1GB"
+    },
+    "$10": {
+        "initial_balance": 10,
+        "exchange": "binance_futures",
+        "leverage": 10,
+        "symbol": "BTCUSDT",
+        "timeframe": "5m",
+        "strategy": "hybrid",
+        "risk_level": "low",
+        "max_open_trades": 2,
+        "position_sizing": {
+            "method": "fixed_fraction",
+            "fraction": 0.8
+        },
+        "safety_orders": {
+            "enabled": true,
+            "max_safety_orders": 3,
+            "martingale_volume_coefficient": 1.2,
+            "martingale_step_coefficient": 1.1
+        },
+        "take_profit": {
+            "enabled": true,
+            "tp_percent": 1.0
+        },
+        "stop_loss": {
+            "enabled": true,
+            "sl_percent": 7.0
+        },
+        "trailing": {
+            "enabled": true,
+            "trailing_percent": 0.3
+        },
+        "session": {
+            "active_hours_only": false,
+            "session_hours": "00:00-23:59"
+        },
+        "vps": "1GB"
+    },
+    "$20": {
+        "initial_balance": 20,
+        "exchange": "binance_futures",
+        "leverage": 10,
+        "symbol": "BTCUSDT",
+        "timeframe": "5m",
+        "strategy": "hybrid",
+        "risk_level": "low",
+        "max_open_trades": 2,
+        "position_sizing": {
+            "method": "fixed_fraction",
+            "fraction": 0.5
+        },
+        "safety_orders": {
+            "enabled": true,
+            "max_safety_orders": 3,
+            "martingale_volume_coefficient": 1.2,
+            "martingale_step_coefficient": 1.1
+        },
+        "take_profit": {
+            "enabled": true,
+            "tp_percent": 1.5
+        },
+        "stop_loss": {
+            "enabled": true,
+            "sl_percent": 7.0
+        },
+        "trailing": {
+            "enabled": true,
+            "trailing_percent": 0.3
+        },
+        "session": {
+            "active_hours_only": false,
+            "session_hours": "00:00-23:59"
+        },
+        "vps": "1GB"
+    },
+    "$30": {
+        "initial_balance": 30,
+        "exchange": "binance_futures",
+        "leverage": 10,
+        "symbol": "BTCUSDT",
+        "timeframe": "5m",
+        "strategy": "hybrid",
+        "risk_level": "balanced",
+        "max_open_trades": 3,
+        "position_sizing": {
+            "method": "fixed_fraction",
+            "fraction": 0.5
+        },
+        "safety_orders": {
+            "enabled": true,
+            "max_safety_orders": 3,
+            "martingale_volume_coefficient": 1.2,
+            "martingale_step_coefficient": 1.1
+        },
+        "take_profit": {
+            "enabled": true,
+            "tp_percent": 1.5
+        },
+        "stop_loss": {
+            "enabled": true,
+            "sl_percent": 7.0
+        },
+        "trailing": {
+            "enabled": true,
+            "trailing_percent": 0.3
+        },
+        "session": {
+            "active_hours_only": false,
+            "session_hours": "00:00-23:59"
+        },
+        "vps": "1GB"
+    },
+    "$40": {
+        "initial_balance": 40,
+        "exchange": "binance_futures",
+        "leverage": 10,
+        "symbol": "BTCUSDT",
+        "timeframe": "5m",
+        "strategy": "hybrid",
+        "risk_level": "balanced",
+        "max_open_trades": 3,
+        "position_sizing": {
+            "method": "fixed_fraction",
+            "fraction": 0.5
+        },
+        "safety_orders": {
+            "enabled": true,
+            "max_safety_orders": 3,
+            "martingale_volume_coefficient": 1.2,
+            "martingale_step_coefficient": 1.1
+        },
+        "take_profit": {
+            "enabled": true,
+            "tp_percent": 1.5
+        },
+        "stop_loss": {
+            "enabled": true,
+            "sl_percent": 7.0
+        },
+        "trailing": {
+            "enabled": true,
+            "trailing_percent": 0.3
+        },
+        "session": {
+            "active_hours_only": false,
+            "session_hours": "00:00-23:59"
+        },
+        "vps": "1GB"
+    },
+    "$50": {
+        "initial_balance": 50,
+        "exchange": "binance_futures",
+        "leverage": 10,
+        "symbol": "BTCUSDT",
+        "timeframe": "5m",
+        "strategy": "hybrid",
+        "risk_level": "balanced",
+        "max_open_trades": 3,
+        "position_sizing": {
+            "method": "fixed_fraction",
+            "fraction": 0.3
+        },
+        "safety_orders": {
+            "enabled": true,
+            "max_safety_orders": 5,
+            "martingale_volume_coefficient": 1.2,
+            "martingale_step_coefficient": 1.1
+        },
+        "take_profit": {
+            "enabled": true,
+            "tp_percent": 1.5
+        },
+        "stop_loss": {
+            "enabled": true,
+            "sl_percent": 7.0
+        },
+        "trailing": {
+            "enabled": true,
+            "trailing_percent": 0.3
+        },
+        "session": {
+            "active_hours_only": false,
+            "session_hours": "00:00-23:59"
+        },
+        "vps": "1GB"
+    },
+    "$60": {
+        "initial_balance": 60,
+        "exchange": "binance_futures",
+        "leverage": 10,
+        "symbol": "BTCUSDT",
+        "timeframe": "5m",
+        "strategy": "hybrid",
+        "risk_level": "balanced_plus",
+        "max_open_trades": 4,
+        "position_sizing": {
+            "method": "fixed_fraction",
+            "fraction": 0.3
+        },
+        "safety_orders": {
+            "enabled": true,
+            "max_safety_orders": 5,
+            "martingale_volume_coefficient": 1.2,
+            "martingale_step_coefficient": 1.1
+        },
+        "take_profit": {
+            "enabled": true,
+            "tp_percent": 1.5
+        },
+        "stop_loss": {
+            "enabled": true,
+            "sl_percent": 7.0
+        },
+        "trailing": {
+            "enabled": true,
+            "trailing_percent": 0.3
+        },
+        "session": {
+            "active_hours_only": false,
+            "session_hours": "00:00-23:59"
+        },
+        "vps": "2GB+"
+    },
+    "$75": {
+        "initial_balance": 75,
+        "exchange": "binance_futures",
+        "leverage": 10,
+        "symbol": "BTCUSDT",
+        "timeframe": "5m",
+        "strategy": "hybrid",
+        "risk_level": "balanced_plus",
+        "max_open_trades": 4,
+        "position_sizing": {
+            "method": "fixed_fraction",
+            "fraction": 0.3
+        },
+        "safety_orders": {
+            "enabled": true,
+            "max_safety_orders": 5,
+            "martingale_volume_coefficient": 1.2,
+            "martingale_step_coefficient": 1.1
+        },
+        "take_profit": {
+            "enabled": true,
+            "tp_percent": 1.5
+        },
+        "stop_loss": {
+            "enabled": true,
+            "sl_percent": 7.0
+        },
+        "trailing": {
+            "enabled": true,
+            "trailing_percent": 0.3
+        },
+        "session": {
+            "active_hours_only": false,
+            "session_hours": "00:00-23:59"
+        },
+        "vps": "2GB+"
+    },
+    "$100": {
+        "initial_balance": 100,
+        "exchange": "binance_futures",
+        "leverage": 10,
+        "symbol": "BTCUSDT",
+        "timeframe": "5m",
+        "strategy": "hybrid_max",
+        "risk_level": "full_aggressive",
+        "max_open_trades": 5,
+        "position_sizing": {
+            "method": "fixed_fraction",
+            "fraction": 0.3
+        },
+        "safety_orders": {
+            "enabled": true,
+            "max_safety_orders": 5,
+            "martingale_volume_coefficient": 1.2,
+            "martingale_step_coefficient": 1.1
+        },
+        "take_profit": {
+            "enabled": true,
+            "tp_percent": 1.5
+        },
+        "stop_loss": {
+            "enabled": true,
+            "sl_percent": 7.0
+        },
+        "trailing": {
+            "enabled": true,
+            "trailing_percent": 0.3
+        },
+        "session": {
+            "active_hours_only": false,
+            "session_hours": "00:00-23:59"
+        },
+        "vps": "2GB+"
+    },
+    "$150": {
+        "initial_balance": 150,
+        "exchange": "binance_futures",
+        "leverage": 10,
+        "symbol": "BTCUSDT",
+        "timeframe": "5m",
+        "strategy": "hybrid_max",
+        "risk_level": "full_aggressive",
+        "max_open_trades": 5,
+        "position_sizing": {
+            "method": "fixed_fraction",
+            "fraction": 0.3
+        },
+        "safety_orders": {
+            "enabled": true,
+            "max_safety_orders": 5,
+            "martingale_volume_coefficient": 1.2,
+            "martingale_step_coefficient": 1.1
+        },
+        "take_profit": {
+            "enabled": true,
+            "tp_percent": 1.5
+        },
+        "stop_loss": {
+            "enabled": true,
+            "sl_percent": 7.0
+        },
+        "trailing": {
+            "enabled": true,
+            "trailing_percent": 0.3
+        },
+        "session": {
+            "active_hours_only": false,
+            "session_hours": "00:00-23:59"
+        },
+        "vps": "2GB+"
+    }
+}
