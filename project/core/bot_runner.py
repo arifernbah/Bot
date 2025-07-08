@@ -12,6 +12,8 @@ from datetime import datetime
 from typing import Dict, Any, Optional
 import gc
 import psutil
+import os
+import subprocess
 
 # Binance imports
 from binance import AsyncClient, BinanceSocketManager
@@ -492,6 +494,21 @@ class BinanceFuturesProBot:
             
             if memory_mb > 800:
                 logger.warning(f"High memory usage: {memory_mb:.1f}MB")
+
+            # Auto reboot VPS if memory consistently high (>700MB) and env allows
+        if memory_mb > 700 and os.getenv("ALLOW_AUTO_REBOOT", "false").lower() == "true":
+            logger.error(f"Memory usage critical {memory_mb:.1f}MB – initiating auto reboot")
+            try:
+                # Inform via Telegram before reboot
+                asyncio.create_task(self.telegram.send_casual_message("🚨 VPS memory >700MB, rebooting..."))
+            except Exception:
+                pass
+
+            # Attempt graceful reboot
+            try:
+                subprocess.Popen(["sudo", "reboot"])  # Non-blocking
+            except Exception as e:
+                logger.error(f"Failed to reboot VPS: {e}")
     
     async def trading_loop(self):
         """PRO TRADER Main Trading Loop - Modular & Intelligent"""

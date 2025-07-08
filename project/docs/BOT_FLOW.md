@@ -88,3 +88,18 @@ python run_bot.py     # mode pro, auto-restart
 | Exit strategy | `modules/smart_trading.SmartExit` |
 
 Simpan dokumen ini.  Untuk perubahan produksi cukup edit file konfigurasi & tier di lokasi di atas, lalu restart bot.
+
+## 8. VPS Memory Guard & Auto-Reboot
+
+| Trigger | Action |
+|---------|--------|
+| RSS > **700 MB** (selama pengecekan `optimize_memory()`)|  • Kirim pesan Telegram ⚠️  
+• Perintah `sudo reboot` (jika env `ALLOW_AUTO_REBOOT=true`) |
+
+Cara mengaktifkan:
+```bash
+export ALLOW_AUTO_REBOOT=true   # set di ~/.bashrc atau crontab
+```
+Pastikan user `ubuntu` (atau yg menjalankan bot) punya izin `sudo reboot` tanpa password (edit `/etc/sudoers` – optional).
+
+Dengan guard ini VPS 1 GB akan otomatis restart sebelum kehabisan memori; `run_bot.py` memakai loop auto-restart sehingga bot akan aktif kembali ±1-2 menit setelah reboot.
