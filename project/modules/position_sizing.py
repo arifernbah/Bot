@@ -113,13 +113,20 @@ class KellyCriterionCalculator:
             # Adjust based on confidence score
             confidence_multiplier = confidence_score / 100
             
-            # Conservative adjustment untuk small accounts
+            # Conservative adjustment untuk small accounts + dynamic tiers
             adjusted_kelly = base_kelly * confidence_multiplier
-            
-            # Safety limits untuk $5 accounts
-            min_risk = 0.005  # 0.5% minimum
-            max_risk = 0.05   # 5% maximum (very conservative)
-            
+
+            # Dynamic risk brackets
+            if balance < 20:
+                min_risk = 0.003   # 0.3%
+                max_risk = 0.03    # 3%
+            elif balance < 100:
+                min_risk = 0.005   # 0.5%
+                max_risk = 0.05    # 5%
+            else:
+                min_risk = 0.005
+                max_risk = 0.06    # 6% for larger accounts
+
             final_risk_pct = max(min_risk, min(adjusted_kelly, max_risk))
             
             # Calculate actual position size
@@ -128,12 +135,20 @@ class KellyCriterionCalculator:
             fee_buffer = balance * FEE_RATE
             risk_amount = max(risk_amount - fee_buffer, 0)
             
+            # Dynamic leverage cap
+            if balance >= 200:
+                leverage_cap = 5
+            elif balance >= 100:
+                leverage_cap = 4
+            else:
+                leverage_cap = 3
+
             return {
                 "risk_percentage": final_risk_pct,
                 "risk_amount": risk_amount,
                 "kelly_suggested": base_kelly,
                 "confidence_multiplier": confidence_multiplier,
-                "max_leverage": min(3, 1 + confidence_multiplier * 2)  # 1x to 3x
+                "max_leverage": min(leverage_cap, 1 + confidence_multiplier * 2)  # 1x-5x dynamic
             }
             
         except Exception as e:
@@ -146,35 +161,41 @@ class KellyCriterionCalculator:
                 "max_leverage": 2
             }
     
-    def get_portfolio_heat(self, active_positions: List[Dict]) -> Dict[str, float]:
-        """Calculate portfolio heat (total risk across positions)"""
-        try:
-            if not active_positions:
-                return {
-                    "total_heat": 0.0,
-                    "position_count": 0,
-                    "max_heat_reached": False
-                }
-            
-            total_risk = 0.0
-            for position in active_positions:
-                position_risk = abs(float(position.get('positionAmt', 0))) * float(position.get('markPrice', 0))
-                total_risk += position_risk
-            
-            # Portfolio heat thresholds
-            max_heat = 0.10  # 10% max total portfolio risk
-            current_heat_pct = total_risk / 100  # Simplified calculation
-            
-            return {
-                "total_heat": current_heat_pct,
-                "position_count": len(active_positions),
-                "max_heat_reached": current_heat_pct > max_heat
-            }
-            
-        except Exception as e:
-            logger.error(f"Error calculating portfolio heat: {e}")
-            return {
-                "total_heat": 0.0,
-                "position_count": 0,
-                "max_heat_reached": False
-            }
+    def get_portfolio_heat(self, active_positions: List[Dict], balance: float) -> Dict[str, float]:
+         """Calculate portfolio heat (total risk across positions)"""
+         try:
+             if not active_positions:
+                 return {
+                     "total_heat": 0.0,
+                     "position_count": 0,
+                     "max_heat_reached": False
+                 }
+             
+             total_risk_usd = 0.0
+             for position in active_positions:
+                 position_value = abs(float(position.get('positionAmt', 0))) * float(position.get('markPrice', 0))
+                 total_risk_usd += position_value
+             
+             # Dynamic heat thresholds
+             if balance < 100:
+                 max_heat_pct = 0.10  # 10%
+             elif balance < 500:
+                 max_heat_pct = 0.125 # 12.5%
+             else:
+                 max_heat_pct = 0.15  # 15%
+             
+             current_heat_pct = total_risk_usd / balance if balance > 0 else 0
+             
+             return {
+                 "total_heat": current_heat_pct,
+                 "position_count": len(active_positions),
+                 "max_heat_reached": current_heat_pct > max_heat_pct,
+                 "max_heat_threshold": max_heat_pct
+             }
+         except Exception as e:
+             logger.error(f"Error calculating portfolio heat: {e}")
+             return {
+                 "total_heat": 0.0,
+                 "position_count": 0,
+                 "max_heat_reached": False
+             }

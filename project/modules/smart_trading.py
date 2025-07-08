@@ -550,15 +550,32 @@ class SmartEntry:
         genius_multiplier = (alignment_strength + pattern_strength + volume_strength) / 3
         genius_multiplier = max(0.5, min(genius_multiplier, 1.5))  # Cap between 0.5x and 1.5x
         
+        # Determine dynamic risk caps based on account size
+        balance = getattr(self.config, 'modal_awal', 5.0)
+        if balance < 20:
+            max_risk_cap = 0.03  # 3 %
+        elif balance < 100:
+            max_risk_cap = 0.05  # 5 %
+        else:
+            max_risk_cap = 0.06  # 6 % for larger accounts
+
         # Final position size calculation
         final_size = base_kelly * score_multiplier * genius_multiplier
-        final_size = max(final_size, 0.005)  # Min 0.5%
-        final_size = min(final_size, 0.04)   # Max 4% (reduced from 5% untuk safety)
+        final_size = max(final_size, 0.003)  # Min 0.3%
+        final_size = min(final_size, max_risk_cap)
         
         # Dynamic leverage based on confidence
         base_leverage = 1 + score_multiplier
         confidence_boost = 1 + (genius_multiplier - 1) * 0.5  # Moderate leverage boost
-        final_leverage = min(base_leverage * confidence_boost, 3)  # Max 3x
+        # Dynamic leverage cap by balance tier
+        if balance >= 200:
+            leverage_cap = 5
+        elif balance >= 100:
+            leverage_cap = 4
+        else:
+            leverage_cap = 3
+
+        final_leverage = min(base_leverage * confidence_boost, leverage_cap)
         
         return {
             'risk_percentage': final_size,
