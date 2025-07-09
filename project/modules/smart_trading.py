@@ -155,6 +155,16 @@ class SmartEntry:
             if not self.ml_filter.pass_filter(features_vec):
                 return {"action": "wait", "confidence": 0, "reason": "ML filter"}
             
+            # ===== Dynamic confidence threshold =====
+            min_conf = 60
+            if trend_dir != 'sideways':
+                min_conf -= 3  # sedikit longgar saat tren jelas
+            if vol_pct > 0.04:
+                min_conf += 5  # lebih ketat saat volatilitas tinggi
+
+            if final_score < min_conf:
+                return {"action": "wait", "confidence": final_score, "reason": f"Confidence {final_score:.1f} < {min_conf}"}
+            
             return {
                 "action": direction.lower(),
                 "confidence": final_score,
