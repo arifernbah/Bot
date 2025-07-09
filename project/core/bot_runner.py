@@ -38,6 +38,7 @@ from modules import (
     SmartExit,
     TelegramNotifier
 )
+from modules.ws_feed import WSPriceCache
 
 # Setup logging
 logging.basicConfig(
@@ -85,6 +86,7 @@ class BinanceFuturesProBot:
         self.last_price_data = {}
         self.memory_optimization_counter = 0
         self.active_entries = {}  # Track entry analysis for pro exits
+        self.ws_cache = None
         
         # Performance monitoring
         self.process = psutil.Process()
@@ -107,6 +109,10 @@ class BinanceFuturesProBot:
                 api_secret=self.config.api_secret,
                 testnet=self.config.is_testnet
             )
+            
+            # Start websocket price cache
+            self.ws_cache = WSPriceCache(self.client, self.symbols, self.config.timeframe)
+            await self.ws_cache.start()
             
             # Test connection
             account_info = await self.client.futures_account()
@@ -320,28 +326,20 @@ class BinanceFuturesProBot:
             logger.error(f"Error restarting bot: {e}")
     
     async def get_klines_data(self, symbol: str, interval: str, limit: int = 100) -> list:
-        """Get klines data dengan memory optimization"""
+        """Get klines data.
+        1) First try websocket cache (lowest latency)
+        2) Fallback to REST if cache not yet filled.
+        """
+        # Try websocket cache
+        if self.ws_cache:
+            data = self.ws_cache.get_klines(symbol, limit)
+            if len(data) >= limit:
+                return data
+        # REST fallback
         try:
-            klines = await self.client.futures_klines(
-                symbol=symbol,
-                interval=interval,
-                limit=limit
-            )
-            
-            # Process and optimize memory usage
-            processed_klines = []
-            for kline in klines:
-                processed_klines.append([
-                    kline[0],  # Open time
-                    float(kline[1]),  # Open
-                    float(kline[2]),  # High
-                    float(kline[3]),  # Low
-                    float(kline[4]),  # Close
-                    float(kline[5])   # Volume
-                ])
-            
-            return processed_klines
-            
+            klines = await self.client.futures_klines(symbol=symbol, interval=interval, limit=limit)
+            processed = [[k[0], float(k[1]), float(k[2]), float(k[3]), float(k[4]), float(k[5])] for k in klines]
+            return processed
         except Exception as e:
             logger.error(f"Error getting klines data: {e}")
             return []

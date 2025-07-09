@@ -15,6 +15,8 @@ from .position_sizing import KellyCriterionCalculator
 from .session_timing import TradingSessionAnalyzer
 from .smart_trading import SmartEntry, SmartExit
 from .telegram_handler import TelegramNotifier
+from .ws_feed import WSPriceCache
+from .ml_filter import MLFilter
 
 __all__ = [
     "SmartConfig",
@@ -37,3 +39,5 @@ except Exception:
 
 # Global constant for total entry+exit fee (e.g., 0.08% on Binance Futures)
 FEE_RATE = 0.0008
+
+__all__.extend(["WSPriceCache", "MLFilter"])

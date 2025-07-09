@@ -13,6 +13,7 @@ from .market_analysis import MarketRegimeDetector, LiquidityZoneDetector, Market
 from .position_sizing import KellyCriterionCalculator
 from .session_timing import TradingSessionAnalyzer
 from .indicators import SmartIndicators
+from .ml_filter import MLFilter
 
 logger = logging.getLogger(__name__)
 
@@ -28,6 +29,8 @@ class SmartEntry:
         self.structure_analyzer = MarketStructureAnalyzer()
         self.kelly_calculator = KellyCriterionCalculator()
         self.session_analyzer = TradingSessionAnalyzer()
+        # ML probability filter (optional)
+        self.ml_filter = MLFilter()
         
         # Performance tracking
         self.trades_history = []
@@ -143,6 +146,14 @@ class SmartEntry:
             # Generate BRILLIANT reason
             reason = f"🧠 Genius Score: {final_score:.1f}/100 | " + " | ".join(signals[:4])
             reason += f" | Kelly: {kelly_data['kelly_percentage']:.3f} | Confidence: {genius_confidence['level']}"
+            
+            # === Optional ML filter ===
+            features_vec = np.array([
+                (short_ma - long_ma) / long_ma,
+                vol_pct,
+            ])
+            if not self.ml_filter.pass_filter(features_vec):
+                return {"action": "wait", "confidence": 0, "reason": "ML filter"}
             
             return {
                 "action": direction.lower(),
