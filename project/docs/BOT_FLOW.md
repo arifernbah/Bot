@@ -103,3 +103,11 @@ export ALLOW_AUTO_REBOOT=true   # set di ~/.bashrc atau crontab
 Pastikan user `ubuntu` (atau yg menjalankan bot) punya izin `sudo reboot` tanpa password (edit `/etc/sudoers` – optional).
 
 Dengan guard ini VPS 1 GB akan otomatis restart sebelum kehabisan memori; `run_bot.py` memakai loop auto-restart sehingga bot akan aktif kembali ±1-2 menit setelah reboot.
+
+## 9. Upgrade v2025-07-08-WS-ML
+
+• WebSocket feed 5-m (module `WSPriceCache`) – latensi <0,5 s.
+• ML logistic-filter (file optional `ml_weights.pkl`) – reject setup prob<0.55.
+• Performa estimasi: WR +4-6 pt, PF +20 %, beban RAM +20 MB.
+
+Tidak ada perubahan pada Telegram atau risk-tier.  Jika model file tidak ada, filter otomatis passthrough.
