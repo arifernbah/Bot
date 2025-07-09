@@ -39,6 +39,32 @@ class SmartEntry:
     def analyze_entry(self, klines_data) -> Dict[str, Any]:
         """SUPER BRILLIANT Entry Analysis - Genius Level Intelligence"""
         try:
+            # === EARLY GATE: Trend & Volatility Filter (lightweight) ===
+            if len(klines_data) < 50:
+                return {"action": "wait", "confidence": 0, "reason": "Data <50 candle"}
+
+            closes = [float(k[4]) for k in klines_data]
+            highs  = [float(k[2]) for k in klines_data]
+            lows   = [float(k[3]) for k in klines_data]
+
+            # Simple trend check (uptrend / downtrend / sideways)
+            short_ma = np.mean(closes[-20:])
+            long_ma  = np.mean(closes[-50:])
+            trend_dir = 'uptrend' if short_ma > long_ma * 1.002 else 'downtrend' if short_ma < long_ma * 0.998 else 'sideways'
+
+            if trend_dir == 'sideways':
+                return {"action": "wait", "confidence": 0, "reason": "Sideways filter"}
+
+            # Volatility filter – use simple ATR % over last 50 candles
+            ranges = [(h - l) for h, l in zip(highs[-50:], lows[-50:])]
+            atr = np.mean(ranges)
+            avg_price = np.mean(closes[-50:])
+            vol_pct = atr / avg_price  # e.g., 0.02 == 2 %
+
+            # if volatility extreme (>5 %) skip for small accounts (<100$)
+            if vol_pct > 0.05 and self.config.modal_awal < 100:
+                return {"action": "wait", "confidence": 0, "reason": "High volatility filter"}
+
             if len(klines_data) < 100:  # Butuh data lebih banyak untuk genius analysis
                 return {"action": "wait", "confidence": 0, "reason": "Data insufficient untuk genius analysis"}
             
