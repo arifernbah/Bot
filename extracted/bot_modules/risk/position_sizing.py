@@ -117,7 +117,7 @@ class KellyCriterionCalculator:
                 "total_trades": 0
             }
     
-    def calculate_position_size(self, symbol: str, balance: float, kelly_pct: float, confidence_score: float, market_data: Dict = None) -> Dict[str, float]:
+    def calculate_position_size(self, symbol: str, balance: float, kelly_pct: float, confidence_score: float, market_data: Dict = None, kelly_enabled: bool = True) -> Dict[str, float]:
         """
         Calculate optimal position size berdasarkan:
         - Kelly Criterion percentage
@@ -126,7 +126,7 @@ class KellyCriterionCalculator:
         """
         try:
             # Activate Kelly only if sufficient equity & data (passed in kelly_pct>0)
-            if balance >= 50 and kelly_pct > 0:
+            if kelly_enabled and balance >= 50 and kelly_pct > 0:
                 base_kelly = kelly_pct
             else:
                 base_kelly = 0.02  # fallback conservative

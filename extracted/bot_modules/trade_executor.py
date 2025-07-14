@@ -98,6 +98,9 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# Minimum equity to allow trading (USDT)
+MIN_BALANCE = 5.0
+
 class BinanceFuturesProBot:
     """
     Professional Trading Bot dengan Modular Structure
@@ -278,7 +281,7 @@ class BinanceFuturesProBot:
                 await self.telegram.send_casual_message(f"✅ *Konek ke Binance Futures berhasil!*\nSaldo: ${usdt_balance:.2f}")
                 
                 # Hard stop if equity below 5 USDT
-                if usdt_balance < 5:
+                if usdt_balance < MIN_BALANCE:
                     await self.telegram.send_casual_message("⚠️ Equity < $5 – Trading halted until balance >= $5")
                     return False
 
