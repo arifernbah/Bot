@@ -1,0 +1,23 @@
+{
+  "0-25": {
+    "risk_level": "conservative",
+    "max_open_positions": 1,
+    "timeframe": "15m",
+    "tp_percent": 1.0,
+    "sl_percent": 3.0
+  },
+  "25-100": {
+    "risk_level": "balanced",
+    "max_open_positions": 2,
+    "timeframe": "5m",
+    "tp_percent": 1.2,
+    "sl_percent": 3.0
+  },
+  "100+": {
+    "risk_level": "aggressive",
+    "max_open_positions": 3,
+    "timeframe": "3m",
+    "tp_percent": 1.5,
+    "sl_percent": 3.5
+  }
+}
