@@ -1,0 +1,10 @@
+aiohttp
+asyncio
+requests
+python-dotenv
+psutil
+numpy
+pytz
+pandas
+python-binance
+python-telegram-bot
