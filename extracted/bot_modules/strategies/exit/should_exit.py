@@ -4,6 +4,7 @@ from bot_modules.ict.liquidity import detect_liquidity_zones
 from bot_modules.ict.market_structure import analyze_structure
 from bot_modules.ict.order_blocks import detect_order_blocks
 from bot_modules.ict.fvg import detect_fvg
+from bot_modules.strategies.exit.trailing_stop import trailing_stop
 
 class SmartExit:
     def __init__(self, config):
@@ -74,4 +75,17 @@ class SmartExit:
                 "reason": f"stop_loss {pnl_pct:.2%}",
                 "urgency": "HIGH",
             }
+
+        # Fee-aware trailing stop (profit-based)
+        ts = trailing_stop(
+            entry_price=entry_price,
+            closes=closes if klines_data else [current_price],
+            high_prices=highs if klines_data else [current_price],
+            low_prices=lows if klines_data else [current_price],
+            side=side,
+            profit_pct=pnl_pct,
+            trail_pct=0.2,
+        )
+        if ts.get("should_exit"):
+            return {"action": "close", "reason": ts["reason"], "urgency": "LOW"}
         return {"action": "hold", "reason": "within_range", "urgency": "NONE"}
