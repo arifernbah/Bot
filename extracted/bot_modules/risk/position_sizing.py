@@ -7,7 +7,7 @@ Professional grade position sizing untuk optimal capital allocation
 import numpy as np
 from typing import Dict, List
 import logging
-from modules.constants import get_fee_rate
+from bot_modules.core.constants import get_fee_rate
 
 # Lightweight helper for small-equity accounts
 def dynamic_fraction(balance: float) -> float:
@@ -114,7 +114,7 @@ class KellyCriterionCalculator:
                 "total_trades": 0
             }
     
-    def calculate_position_size(self, balance: float, kelly_pct: float, confidence_score: float) -> Dict[str, float]:
+    def calculate_position_size(self, symbol: str, balance: float, kelly_pct: float, confidence_score: float, market_data: Dict = None) -> Dict[str, float]:
         """
         Calculate optimal position size berdasarkan:
         - Kelly Criterion percentage

@@ -46,7 +46,7 @@ def _calculate_genius_position_size(self, score: float, kelly_data: Dict, pro_an
             max_risk_cap = 0.025  # 2.5%
 
         # Fee-aware position sizing
-        from modules.constants import get_fee_rate
+        from bot_modules.core.constants import get_fee_rate
         fee_rate = get_fee_rate()
         total_fee_pct = fee_rate * 2  # Entry + Exit fees
         

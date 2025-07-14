@@ -6,3 +6,5 @@ psutil
 numpy
 pytz
 pandas
+python-binance
+python-telegram-bot

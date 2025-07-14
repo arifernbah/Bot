@@ -1,4 +1,5 @@
 from bot_modules.utils.symbol_loader import fetch_top_futures_symbols
+import asyncio
 #!/usr/bin/env python3
 """
 Configuration Manager Module
@@ -121,7 +122,7 @@ class SmartConfig:
                 if 'symbols' in config_data:
                     self.symbols = config_data['symbols']
                 elif 'symbol' in config_data:
-                    self.symbols = asyncio.run(fetch_top_futures_symbols())]
+                    self.symbols = asyncio.run(fetch_top_futures_symbols())
                 else:
                     pass  # Keep default symbols list
                         
