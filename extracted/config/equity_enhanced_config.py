@@ -174,6 +174,11 @@ class EnhancedEquityTrading:
             # else ignore malformed
         return selected
 
+    # ------------------------------------------------------------------
+    def get_dynamic_strategy(self) -> dict:
+        """Public accessor used by other modules (e.g., trade_executor)."""
+        return self.dynamic_strategy
+
     # ---------------------------------------------------------------------
     # String repr helpers
     # ---------------------------------------------------------------------
