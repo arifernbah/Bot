@@ -122,8 +122,11 @@ class KellyCriterionCalculator:
         - Account balance
         """
         try:
-            # Base Kelly percentage
-            base_kelly = kelly_pct
+            # Activate Kelly only if sufficient equity & data (passed in kelly_pct>0)
+            if balance >= 50 and kelly_pct > 0:
+                base_kelly = kelly_pct
+            else:
+                base_kelly = 0.02  # fallback conservative
             
             # Adjust based on confidence score
             confidence_multiplier = confidence_score / 100
