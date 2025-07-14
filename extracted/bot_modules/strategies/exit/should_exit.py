@@ -1,5 +1,7 @@
 """Smart exit logic (simplified) using basic stop-loss and take-profit."""
 from typing import Dict, List
+from bot_modules.ict.liquidity import detect_liquidity_zones
+from bot_modules.ict.market_structure import analyze_structure
 
 class SmartExit:
     def __init__(self, config):
@@ -24,6 +26,24 @@ class SmartExit:
             if side == "long"
             else (entry_price - current_price) / entry_price
         )
+
+        # ICT-based early exit: liquidity sweep detection
+        if klines_data and len(klines_data) >= 50:
+            closes = [float(k[4]) for k in klines_data]
+            liq = detect_liquidity_zones(closes)
+            struct = analyze_structure(closes)
+
+            # Exit if liquidity sweep against position bias
+            if side == "long" and liq["bias"] == "bearish" and liq["equal_high_count"] >= 3:
+                return {"action": "close", "reason": "liquidity_sweep_up", "urgency": "HIGH"}
+            if side == "short" and liq["bias"] == "bullish" and liq["equal_low_count"] >= 3:
+                return {"action": "close", "reason": "liquidity_sweep_down", "urgency": "HIGH"}
+
+            # Exit on market structure shift
+            if side == "long" and struct["bias"] == "bearish":
+                return {"action": "close", "reason": "structure_shift_bearish", "urgency": "MEDIUM"}
+            if side == "short" and struct["bias"] == "bullish":
+                return {"action": "close", "reason": "structure_shift_bullish", "urgency": "MEDIUM"}
 
         # Basic SL / TP thresholds from config else defaults
         tp = getattr(self.config, "tp_percent", 1.0) / 100

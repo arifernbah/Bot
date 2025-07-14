@@ -1229,6 +1229,13 @@ class BinanceFuturesProBot:
                 if self.equity_trader:
                     self.equity_trader.add_trade_result(profit_pct * 100)  # Convert to percentage
                     logger.info(f"Equity updated: Trade result {profit_pct:.2%} added to performance tracking")
+
+                    # Check if equity level change requires config update
+                    if self.equity_trader.update_equity(balance := (float(position_data['unRealizedProfit']) + float(position_data['isolatedWallet']))):
+                        dyn = self.equity_trader.get_dynamic_strategy()
+                        logger.info(f"[DYNAMIC] Strategy tier changed ⇒ {dyn}")
+                        for k, v in dyn.items():
+                            setattr(self.config, k, v) if not isinstance(self.config, dict) else self.config.__setitem__(k, v)
                 
                 del self.active_entries[symbol]
             
