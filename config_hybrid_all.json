@@ -1,0 +1,25 @@
+{
+  "entry": {
+    "strategy": "smart",
+    "confluence": true,
+    "volume_profile": true,
+    "liquidity": true,
+    "sentiment_weight": 1.2
+  },
+  "exit": {
+    "trailing_mode": "profit",
+    "trailing_type": "atr",
+    "atr_k": 2,
+    "atr_period": 14,
+    "fee_pct": 0.0015
+  },
+  "risk": {
+    "kelly_enabled": true,
+    "max_risk_per_trade": 0.03
+  },
+  "telegram": {
+    "enabled": true,
+    "send_on_entry": true,
+    "send_on_exit": true
+  }
+}
