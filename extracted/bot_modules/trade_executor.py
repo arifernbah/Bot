@@ -277,6 +277,11 @@ class BinanceFuturesProBot:
                 logger.info(f"Connected to Binance Futures. Balance: {usdt_balance} USDT")
                 await self.telegram.send_casual_message(f"✅ *Konek ke Binance Futures berhasil!*\nSaldo: ${usdt_balance:.2f}")
                 
+                # Hard stop if equity below 5 USDT
+                if usdt_balance < 5:
+                    await self.telegram.send_casual_message("⚠️ Equity < $5 – Trading halted until balance >= $5")
+                    return False
+
                 # Get tradeable symbols from top volume
                 tradeable_symbols = await self.get_tradeable_symbols(usdt_balance)
                 if tradeable_symbols:
@@ -1089,11 +1094,17 @@ class BinanceFuturesProBot:
                 from bot_modules.risk.position_sizing import dynamic_fraction
                 risk_pct = position_sizing.get('risk_percentage', dynamic_fraction(balance))
                 
-                # Calculate auto leverage based on market conditions
+                # Calculate auto leverage based on market conditions & 5-USDT notional rule
                 market_data = {
                     'volatility': self._calculate_market_volatility(symbol, klines_data) if klines_data else 0.03
                 }
-                leverage = int(self.position_sizing.calculate_auto_leverage(symbol, balance, market_data))
+                leverage = int(self.position_sizing.calculate_auto_leverage(
+                    symbol,
+                    balance,
+                    market_data,
+                    risk_amount=risk_amount,
+                    price=current_price
+                ))
                 
                 risk_amount = balance * risk_pct
                 quantity = (risk_amount * leverage) / current_price
