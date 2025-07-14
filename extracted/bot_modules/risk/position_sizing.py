@@ -9,6 +9,9 @@ from typing import Dict, List
 import logging
 from bot_modules.core.constants import get_fee_rate
 
+# Binance minimum notional requirement (USDT)
+MIN_NOTIONAL = 5.0
+
 # Lightweight helper for small-equity accounts
 def dynamic_fraction(balance: float) -> float:
     """Return risk fraction based on current balance.
@@ -216,18 +219,20 @@ class KellyCriterionCalculator:
                  "max_heat_reached": False
              }
 
-    def calculate_auto_leverage(self, symbol: str, balance: float, market_data: Dict = None) -> float:
+    def calculate_auto_leverage(self, symbol: str, balance: float, market_data: Dict = None, risk_amount: float | None = None, price: float | None = None) -> float:
         """Calculate optimal leverage based on market conditions, balance, and symbol"""
         try:
-            # Base leverage by balance tier - OPTIMIZED
-            if balance < 20:
+            # Base leverage inversely proportional to balance
+            if balance <= 25:
+                base_leverage = 4.0   # small equity → higher lev to hit 5 USDT notional
+            elif balance <= 50:
+                base_leverage = 3.5
+            elif balance <= 100:
+                base_leverage = 3.0
+            elif balance <= 250:
                 base_leverage = 2.5
-            elif balance < 100:
-                base_leverage = 3.5  # Increased from 3.0
-            elif balance < 500:
-                base_leverage = 4.0  # Increased from 3.5
-            else:  # $100+
-                base_leverage = 5.0  # Professional leverage for $100+
+            else:
+                base_leverage = 2.0   # big equity → lower leverage (kelly more stable)
             
             # Symbol-specific adjustment
             symbol_adjustment = 1.0
@@ -256,12 +261,18 @@ class KellyCriterionCalculator:
             
             # Calculate final leverage
             final_leverage = base_leverage * symbol_adjustment * volatility_adjustment
+
+            # ------------------------------------------------------------------
+            # Ensure notional ≥ BINANCE_MIN (5 USDT) by boosting leverage if needed
+            # ------------------------------------------------------------------
+            if risk_amount is not None and price is not None and risk_amount > 0:
+                if (risk_amount * final_leverage) < MIN_NOTIONAL:
+                    needed = MIN_NOTIONAL / risk_amount
+                    final_leverage = max(final_leverage, needed)
             
             # Apply safety limits - OPTIMIZED
-            if balance >= 100:
-                max_leverage = 7.0  # Higher limit for $100+
-            else:
-                max_leverage = 4.0  # Standard limit for smaller balances
+            # Tighter cap for large balances to keep DD reasonable
+            max_leverage = 8.0 if balance < 50 else 6.0 if balance < 100 else 5.0
             min_leverage = 1.5
             
             final_leverage = max(min_leverage, min(final_leverage, max_leverage))

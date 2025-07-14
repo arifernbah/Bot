@@ -87,4 +87,7 @@ class SmartEntry:
         if hasattr(self.config, "equity_trader"):
             kelly_pct = getattr(self.config.equity_trader, "kelly_multiplier", 0.0)
         calc = KellyCriterionCalculator()
-        return calc.calculate_position_size(symbol, balance, kelly_pct, confidence)
+        sizing = calc.calculate_position_size(symbol, balance, kelly_pct, confidence)
+        # Store risk_pct for later leverage boost
+        sizing["risk_amount"] = balance * sizing["risk_percentage"]
+        return sizing
