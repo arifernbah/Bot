@@ -68,7 +68,7 @@ class EnhancedEquityTrading:
     # ---------------------------------------------------------------------
     # Utility helpers
     # ---------------------------------------------------------------------
-    def update_equity(self, new_equity: float):
+    def update_equity(self, new_equity: float) -> bool:
         """Update equity / drawdown stats and recompute Kelly sizing."""
         self.current_balance = new_equity
         if new_equity > self.peak_equity:
@@ -77,6 +77,11 @@ class EnhancedEquityTrading:
             dd = (self.peak_equity - new_equity) / self.peak_equity * 100
             self.current_drawdown = round(dd, 2)
         self.kelly_position_size = self.calculate_kelly_position()
+        # Determine if strategy tier changed
+        new_dyn = self._select_strategy_from_map(new_equity)
+        changed = new_dyn != self.dynamic_strategy
+        self.dynamic_strategy = new_dyn
+        return changed
 
     def calculate_kelly_position(self) -> float:
         """Return nominal Kelly position size (USDT) using a fixed multiplier."""
@@ -102,7 +107,7 @@ class EnhancedEquityTrading:
             self.trades_history = self.trades_history[-200:]
 
         # Re-compute Kelly after sufficient data
-        if len(self.trades_history) >= 10:
+        if self.current_balance >= 50 and len(self.trades_history) >= 10:
             wins = [t["pnl_pct"] for t in self.trades_history if t["pnl_pct"] > 0]
             losses = [abs(t["pnl_pct"]) for t in self.trades_history if t["pnl_pct"] < 0]
             if wins and losses:
