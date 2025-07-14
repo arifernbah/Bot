@@ -215,30 +215,33 @@ class BinanceFuturesProBot:
                 ticker = await self.client.futures_symbol_ticker(symbol=symbol)
                 current_price = float(ticker['price'])
 
-            # Hitung spread_pct sederhana dari best bid/ask (default fallback)
-            depth = await self.client.futures_order_book(symbol=symbol)
-            bid = float(depth['bids'][0][0])
-            ask = float(depth['asks'][0][0])
-            mid = (bid + ask) / 2
-            spread_pct = abs(ask - bid) / mid * 100
-            order_type = determine_order_type(spread_pct)
-            logger.info(f"[ORDER] Using order type: {order_type} (spread={spread_pct:.4f}%)")
+                # Hitung spread_pct sederhana dari best bid/ask (default fallback)
+                depth = await self.client.futures_order_book(symbol=symbol)
+                bid = float(depth['bids'][0][0])
+                ask = float(depth['asks'][0][0])
+                mid = (bid + ask) / 2
+                spread_pct = abs(ask - bid) / mid * 100
+                order_type = determine_order_type(spread_pct)
+                logger.info(f"[ORDER] Using order type: {order_type} (spread={spread_pct:.4f}%)")
 
-                
                 # Calculate minimum order value
                 min_order_value = min_qty * current_price
-                
+
                 # Check if balance is enough (with 5x leverage)
                 leverage = 5
                 min_balance_needed = min_order_value / leverage
-                
-                logger.info(f"Symbol: {symbol}, Min Order Value: ${min_order_value:.4f}, Min Balance Needed: ${min_balance_needed:.2f}")
-                
+
+                logger.info(
+                    f"Symbol: {symbol}, Min Order Value: ${min_order_value:.4f}, Min Balance Needed: ${min_balance_needed:.2f}"
+                )
+
                 if balance >= min_balance_needed:
                     tradeable_symbols.append(symbol)
                     logger.info(f"✅ {symbol} tradeable with balance ${balance:.2f}")
                 else:
-                    logger.info(f"❌ {symbol} requires ${min_balance_needed:.2f}, balance ${balance:.2f} insufficient")
+                    logger.info(
+                        f"❌ {symbol} requires ${min_balance_needed:.2f}, balance ${balance:.2f} insufficient"
+                    )
             
             logger.info(f"Tradeable symbols: {tradeable_symbols}")
             return tradeable_symbols
