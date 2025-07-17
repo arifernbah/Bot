@@ -3,6 +3,7 @@ import json
 from datetime import datetime
 from core.config import config
 from utils.logger import logger
+import re
 
 class TelegramBot:
     def __init__(self):
@@ -31,31 +32,43 @@ class TelegramBot:
             logger.error(f"Telegram connection error: {e}")
             return False
     
+    def escape_markdown(self, text):
+        """Escape karakter khusus Markdown v2"""
+        escape_chars = r'_*[]()~`>#+-=|{}.!'
+        return re.sub(f'([{re.escape(escape_chars)}])', r'\\\1', text)
+    
     def send_message(self, message, parse_mode="Markdown"):
-        """Send message to Telegram"""
+        """Send message to Telegram with Markdown escape and fallback"""
         try:
             if not config.ENABLE_TELEGRAM:
                 logger.info(f"Telegram disabled. Message: {message}")
                 return True
-            
             url = f"{self.base_url}/sendMessage"
-            
             payload = {
                 'chat_id': self.chat_id,
-                'text': message,
+                'text': self.escape_markdown(message) if parse_mode=="Markdown" else message,
                 'parse_mode': parse_mode
             }
-            
             response = requests.post(url, json=payload, timeout=10)
-            
             if response.status_code == 200:
                 logger.info("Telegram message sent successfully")
                 return True
             else:
                 error_msg = response.json().get('description', 'Unknown error')
-                logger.error(f"Telegram send failed: {error_msg}")
+                logger.error(f"Telegram send failed: {error_msg}. Retrying without Markdown...")
+                # Coba ulang tanpa parse_mode jika error markdown
+                if parse_mode == "Markdown":
+                    payload.pop('parse_mode')
+                    payload['text'] = message
+                    response = requests.post(url, json=payload, timeout=10)
+                    if response.status_code == 200:
+                        logger.info("Telegram message sent successfully (no markdown)")
+                        return True
+                    else:
+                        error_msg = response.json().get('description', 'Unknown error')
+                        logger.error(f"Telegram send failed (no markdown): {error_msg}")
+                        return False
                 return False
-                
         except Exception as e:
             logger.error(f"Telegram send error: {e}")
             return False
