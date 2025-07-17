@@ -758,7 +758,7 @@ class EnhancedICTTrader:
         total = len(recent)
         if total == 0:
             return 0
-        return round((wins / total) * 100, 1)
+        return round((wins / total) * 100)
     
     def get_drawdown(self):
         """Calculate current drawdown percentage"""
@@ -783,7 +783,8 @@ class EnhancedICTTrader:
             return max(0, drawdown)
         except Exception as e:
             logger.error(f"Failed to calculate drawdown: {e}")
-            return 0.0  
+            return 0 
+    
     def get_consecutive_losses(self):
         """ber of consecutive losses"""
         return self.performance.get('consecutive_losses', 0)
@@ -799,4 +800,16 @@ class EnhancedICTTrader:
     def get_performance(self):
         """ormance statistics"""
         return self.get_enhanced_performance()
+    
+    def get_consecutive_losses_fixed(self):
+      ber of consecutive losses       return self.performance.get('consecutive_losses', 0)
+    
+    def get_active_trades_fixed(self):
+      t number of active trades        return len(self.active_positions)
+    
+    def get_daily_trades_fixed(self):
+      t number of trades today       return self.daily_trades
+    
+    def get_performance_fixed(self):
+        ormance statistics       return self.get_enhanced_performance() 
     
