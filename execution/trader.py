@@ -786,30 +786,18 @@ class EnhancedICTTrader:
             return 0 
     
     def get_consecutive_losses(self):
-        """ber of consecutive losses"""
+        """Return number of consecutive losses"""
         return self.performance.get('consecutive_losses', 0)
     
     def get_active_trades(self):
-        """t number of active trades"""
+        """Return number of active trades"""
         return len(self.active_positions)
     
     def get_daily_trades(self):
-        """t number of trades today"""
+        """Return number of trades today"""
         return self.daily_trades
     
     def get_performance(self):
-        """ormance statistics"""
-        return self.get_enhanced_performance()
-    
-    def get_consecutive_losses_fixed(self):
-      ber of consecutive losses       return self.performance.get('consecutive_losses', 0)
-    
-    def get_active_trades_fixed(self):
-      t number of active trades        return len(self.active_positions)
-    
-    def get_daily_trades_fixed(self):
-      t number of trades today       return self.daily_trades
-    
-    def get_performance_fixed(self):
-        ormance statistics       return self.get_enhanced_performance() 
+        """Return performance statistics"""
+        return self.get_enhanced_performance() 
     
