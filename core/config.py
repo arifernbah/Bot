@@ -5,7 +5,7 @@ class Config:
     def __init__(self):
         load_dotenv()
         
-        # Test Mode - Set to truentuk testing tanpa API key
+        # Test Mode - Default ke False (real/live)
         self.TEST_MODE = os.getenv('TEST_MODE', 'False').lower() == 'true'
         # API Credentials
         self.BINANCE_API_KEY = os.getenv('BINANCE_API_KEY', 'test_key' if self.TEST_MODE else None)
