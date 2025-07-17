@@ -7,6 +7,7 @@ from integrations.telegram import telegram
 from strategies.ict_core import ICTStrategy
 from execution.trader import EnhancedICTTrader
 from analysis.bias import BiasAnalyzer
+from utils.binance_pairs import update_config_trading_pairs
 
 class ICTBot:
     def __init__(self):
@@ -195,5 +196,6 @@ class ICTBot:
             logger.error(f"Status update error: {e}")
 
 if __name__ == "__main__":
+    update_config_trading_pairs()
     bot = ICTBot()
     bot.start()
