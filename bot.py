@@ -5,7 +5,7 @@ from core.config import config
 from utils.logger import logger
 from integrations.telegram import telegram
 from strategies.ict_core import ICTStrategy
-from execution.trader import ICTTrader
+from execution.trader import EnhancedICTTrader
 from analysis.bias import BiasAnalyzer
 
 class ICTBot:
@@ -16,7 +16,7 @@ class ICTBot:
         
         # Components
         self.strategy = ICTStrategy()
-        self.trader = ICTTrader()
+        self.trader = EnhancedICTTrader()
         self.analyzer = BiasAnalyzer()
         
         # Performance Parameters
@@ -70,7 +70,7 @@ class ICTBot:
                             self.execute_signal(signal, bias)
                 
                 # Manage positions
-                self.trader.manage_positions()
+                self.trader.manage_positions_enhanced()
             
             # Update status
             self.update_status()
@@ -105,10 +105,9 @@ class ICTBot:
         try:
             # Calculate position size
             risk = self.calculate_risk()
-            position_size = self.trader.calculate_position_size(signal, risk)
-            
+            position_size = self.trader.calculate_adaptive_position_size(signal, risk * 100)
             # Execute trade
-            success = self.trader.execute_entry(signal, position_size)
+            success = self.trader.execute_entry_enhanced(signal)
             
             if success and config.ENABLE_TELEGRAM:
                 # Send signal notification

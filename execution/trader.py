@@ -1,4 +1,4 @@
-from execution.Telegram import telegram
+from integrations.telegram import telegram
 from datetime import datetime, timedelta
 from utils.logger import logger
 from core.config import config
@@ -759,4 +759,44 @@ class EnhancedICTTrader:
         if total == 0:
             return 0
         return round((wins / total) * 100, 1)
+    
+    def get_drawdown(self):
+        """Calculate current drawdown percentage"""
+        try:
+            if not hasattr(self, 'trade_history') or not self.trade_history:
+                return 0.0
+            # Calculate peak and current equity
+            equity_curve = []
+            current_equity = 100  # Start with 100      
+            for trade in self.trade_history:
+                if trade.get("result") == "win":
+                    current_equity += trade.get("pnl_percent")
+                else:
+                    current_equity -= trade.get("pnl_percent")
+                equity_curve.append(current_equity)
+            
+            if not equity_curve:
+                return 0.0
+            peak = max(equity_curve)
+            current = equity_curve[-1]
+            drawdown = ((peak - current) / peak) * 100      
+            return max(0, drawdown)
+        except Exception as e:
+            logger.error(f"Failed to calculate drawdown: {e}")
+            return 0.0  
+    def get_consecutive_losses(self):
+        """ber of consecutive losses"""
+        return self.performance.get('consecutive_losses', 0)
+    
+    def get_active_trades(self):
+        """t number of active trades"""
+        return len(self.active_positions)
+    
+    def get_daily_trades(self):
+        """t number of trades today"""
+        return self.daily_trades
+    
+    def get_performance(self):
+        """ormance statistics"""
+        return self.get_enhanced_performance()
     
