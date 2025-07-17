@@ -5,13 +5,15 @@ class Config:
     def __init__(self):
         load_dotenv()
         
+        # Test Mode - Set to truentuk testing tanpa API key
+        self.TEST_MODE = os.getenv('TEST_MODE', 'False').lower() == 'true'
         # API Credentials
-        self.BINANCE_API_KEY = os.getenv('BINANCE_API_KEY')
-        self.BINANCE_SECRET = os.getenv('BINANCE_SECRET')
+        self.BINANCE_API_KEY = os.getenv('BINANCE_API_KEY', 'test_key' if self.TEST_MODE else None)
+        self.BINANCE_SECRET = os.getenv('BINANCE_SECRET', 'test_secret' if self.TEST_MODE else None)
         
         # Telegram Config
-        self.TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
-        self.TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
+        self.TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN', 'est_token' if self.TEST_MODE else None)
+        self.TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID', 'test_chat_id' if self.TEST_MODE else None)
         
         # ✅ Trading Pairs - Added missing configuration
         self.TRADING_PAIRS = os.getenv('TRADING_PAIRS', 'BTCUSDT,ETHUSDT,ADAUSDT,BNBUSDT,SOLUSDT,XRPUSDT').split(',')
@@ -72,6 +74,11 @@ class Config:
     
     def _validate_config(self):
         """Validate critical configuration settings"""
+        # Skip validation if in test mode
+        if self.TEST_MODE:
+            print("⚠️ Running in TEST MODE - API validation skipped")
+            return
+            
         critical_settings = [
             ('BINANCE_API_KEY', self.BINANCE_API_KEY),
             ('BINANCE_SECRET', self.BINANCE_SECRET),
