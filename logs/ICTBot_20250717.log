@@ -29409,3 +29409,7 @@
 2025-07-17 04:21:45,331 - ICTBot - ERROR - Telegram send error: maximum recursion depth exceeded
 2025-07-17 04:21:45,585 - ICTBot - ERROR - Telegram send failed (no markdown): Not Found
 2025-07-17 04:21:45,666 - ICTBot - ERROR - Telegram send error: maximum recursion depth exceeded
+2025-07-17 06:43:51,945 - ICTBot - INFO - Telegram bot connected: Signalbyarif_bot
+2025-07-17 06:43:52,287 - ICTBot - ERROR - Gagal fetch top volume pairs: string indices must be integers, not 'str'
+2025-07-17 06:43:52,726 - ICTBot - INFO - Telegram message sent successfully
+2025-07-17 06:43:52,727 - ICTBot - WARNING - Gagal update TRADING_PAIRS, menggunakan default.
